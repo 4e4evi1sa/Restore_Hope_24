@@ -202,12 +202,6 @@ function main() {
         while (go) {
             const giverAddress = bestGiver.address;
             const [seed, complexity, iterations] = yield getPowInfo(liteClient, core_1.Address.parse(giverAddress));
-            if (seed === lastMinedSeed) {
-                // console.log('Wating for a new seed')
-                updateBestGivers(liteClient, wallet.address);
-                yield delay(200);
-                continue;
-            }
             const randomName = (yield (0, crypto_1.getSecureRandomBytes)(8)).toString('hex') + '.boc';
             const path = `bocs/${randomName}`;
             const command = `${bin} -g ${gpu} -F 128 -t ${timeout} ${targetAddress} ${seed} ${complexity} ${iterations} ${giverAddress} ${path}`;
@@ -229,11 +223,6 @@ function main() {
                 console.log(`${formatTime()}: not mined`, seed.toString(16).slice(0, 4), i++, success, Math.floor((Date.now() - start) / 1000));
             }
             if (mined) {
-                const [newSeed] = yield getPowInfo(liteClient, core_1.Address.parse(giverAddress));
-                if (newSeed !== seed) {
-                    console.log('Mined already too late seed');
-                    continue;
-                }
                 console.log(`${formatTime()}:     mined`, seed.toString(16).slice(0, 4), i++, ++success, Math.floor((Date.now() - start) / 1000));
                 let seqno = 0;
                 if (liteClient instanceof ton_lite_client_1.LiteClient || liteClient instanceof ton_1.TonClient4) {
